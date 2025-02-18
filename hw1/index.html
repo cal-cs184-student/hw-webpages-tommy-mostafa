@@ -47,14 +47,35 @@
 		-->
 
 		<h2>Overview</h2>
-		 
+		This work develops a simple rasterizer, a solution to aliasing with super sampling, some rotation/translation transforms, and different sampling techniques for texture mapping. We compare the effects of supersampling rates of 1, 4, 
+		9, and 16 samples per pixel on antialiasing, where a higher supersampling rate corresponds to better antialiasing performance (i.e. less "jaggies"). We also implement bilinear
+		and nearest pixel sampling techniques for texture mapping, which utilizes a barycentric coordinate transformation - quite literally - behind the scenes. We combine these pixel sampling techniques
+		with zero, nearest, and linear level sampling techniques with mipmaps to reduce aliasing for "distant" artifacts in a scene.       
 
-		<p> TODO write a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework. </p>
+		<!-- <p> TODO write a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework. </p> -->
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
-		<p>Our team tried out two approaches. First, we rasterized by swapping coordinates of the vertices to force a counter-clockwise winding order. 
-		We then defined the bounding box and the dX and dY coordinates of each vertex. From there, we could easily calculate the point-in-triangle test of each coordinate in the bounding box. Any points on the edge were treated as if they were in the triangle.
-		To improve this for efficiency, we rewrote the conditionals to minimize evalutations whenever possible. We also removed the function to swap coordinates for the counter-clockwise winding order, and rewrote the math to handle both cases, separated by an if statement, again allowing for fewer operations. 
+		<p>The concept of rasterization is to simply draw a continuous vector graphics (svg) triangle on a screen by 
+			sampling discrete pixels on the screen and checking whether each pixel lies inside the continuous triangle. The general steps to rasterize a triangle can be summarized as follows:
+		</p>
+			
+		<ul>
+			<li> Receive three vertices \( (x_1,y_1)\), \( (x_2,y_2)\), and \( (x_3,y_3)\) defining a triangle. </li>
+			<li> Calculate the vectors \( T_1, T_2, T_3\) between each two adjacent vertices. </li>
+			<li> Compute the perpendiculars to each vector by simply swapping its coordinates and multiplying the new /(x/) coordinate by -1 (note that the winding order here matters). </li>
+			<li> Loop through the centers of the pixels in a bounding box defined by \( x_{min},y_{min}\), and \( x_{max},y_{max}\) and determine whether the center of the pixel lies inside 
+				the triangle. </li>
+		</ul>
+			
+		 </p>To do this, we tried out two approaches for drawing single color triangles. 
+			First, we rasterized each triangle by swapping coordinates of the vertices to force a counter-clockwise winding order. This helps us ensure a correct perpendicular direction calculation for subsequent steps. 
+		We then defined a bounding box around and the \( x_{min},y_{min}\), and \( x_{max},y_{max}\) coordinates of all three vertices. From there, we could easily calculate the point-in-triangle test of each coordinate in the bounding box. Any points on the edge were treated as if they were in the triangle.
+		</p>
+		<p><b>Extra Credit:</b></p>
+		<p>
+		To improve this for efficiency, we tried another approach by rewriting the conditionals that evaluate the point in triangle tests by sequentially checking each dot product between the center of the pixel
+		and the three vertices instead of checking all three at once. We also removed the function to swap coordinates for the counter-clockwise winding order by calculating the signed area as  \( A = 0.5 \times \left( x_1 \cdot y_2 + x_2 \cdot y_3 + x_3 \cdot y_1 - y_1 \cdot x_2 - y_2 \cdot x_3 - y_3 \cdot x_1 \right) \), 
+		where \( A > 0 \) indicates counter clockwise winding and \( A < 0 \) indicates clockwise winding. We explicitly rewrote the math to handle both cases, separated by an if statement, to again allow for fewer operations. The table below shows the difference in run time between the two algorithms.
 		</p>
 		<p>
 		Our search algorithm is equally as efficient for checking each sample within a bounding box. By choosing the maximum and minimum x and y coordinates of the triangle and then rounding up for the maxima and down for the minima, we define the most spatially efficient rectangle to enclose the triangles.
@@ -88,10 +109,18 @@
 		</div>
 		TODO: EC -> add table of run times, need to run tommys old version and then current versipn for data
 		<h2>Task 2: Antialiasing by Supersampling</h2>
-		
+		<p>
+			Supersampling is a relatively easy and intuitive (albeit expensive) method for antialiasing. The general idea is simple: instead of checking for point-in-triangle 
+			intersections for the center of each pixel during rasterization, we split the pixel into smaller subpixels and check for intersections for the centers of those subpixels. 
+			We can then take the average of the color values of each subpixel to the resolve the color of the origial pixel size.  
+		</p>
 
-		<p>For the algorithm, we first had to update the sample buffer to be resized according to the sample rate, enabling storage for supersampling. We did not resize the framebuffer. Our algorithm had to be modified to step through pixels with the new dimensions we were sampling for, i.e. an increase by the square root of the super sampling rate in each dimension. 
-		We also did "block stepping", where we incremented through the matrix of pixel data in "blocks" that were representative of the supersampled pixels surrounding each real pixel. The color values of the supersampled pixels were averaged and then stored in the frame buffer for the real pixel. Ultimately, we were able to recycle the previous rasterization pipeline, only modifying the for loops to achieve block steps through the matrices and the sample buffer to allow for higher frequency sampling.
+		<p>For the algorithm, we first had to update the sample buffer to be resized according to the sample rate, enabling storage for supersampling. We did not resize the framebuffer.
+		 Our algorithm had to be modified to step through pixels with the new dimensions we were sampling for, i.e. an increase by the square root of the super sampling rate in each 
+		dimension. This resulted in a sample buffer index of <code>(j * sqrt_samples + sj) * width * sqrt_samples + (i * sqrt_samples + si)</code> where i and j are the indices that loop 
+		through the width and height of the bounding box and increment by 1, and sj and si are the supersampling indices that loop from 0 to the square root of the sampling rate.
+		This resulted in "block stepping", where we incremented through the matrix of pixel data in "blocks" that were representative of the supersampled pixels surrounding each real pixel.
+		The color values of the supersampled pixels were averaged and then stored in the frame buffer for the real pixel. Ultimately, we were able to recycle the previous rasterization pipeline, only modifying the for loops to achieve block steps through the matrices and the sample buffer to allow for higher frequency sampling.
 		While there is some extra requirements for the memory and overhead to accurately increment through the matrices, the improvement in the image quality makes it worthwhile. 
 		Supersampling accomplishes improved quality by sampling across a finer mesh and then averaging it to the coarser pixel grid. This method reduces aliasing by capturing the higher frequency information that would otherwise be lost by only sampling at each pixel. This leads to a visually sharper image with fewer "jaggies".
 		</p>
@@ -104,17 +133,17 @@
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="Figures/Task 2/1 Sample Rate.png" width="400px"/>
-				  <figcaption>Sample Rate 1.</figcaption>
+				  <figcaption>Sample Rate 1 showing clear "jaggies". </figcaption>
 				</td>
 				<td style="text-align: center;">
 				  <img src="Figures/Task 2/4 Sample Rate.png" width="400px"/>
-				  <figcaption>Sample Rate 4.</figcaption>
+				  <figcaption>Sample Rate 4 showing some improvement. </figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="Figures/Task 2/16 Sample Rate.png" width="400px"/>
-				  <figcaption>Sample Rate 16.</figcaption>
+				  <figcaption>Sample Rate 16 showing almost completely sharp edges. </figcaption>
 				</td>
 			  </tr>
 			</table>
@@ -122,11 +151,31 @@
 
 		<h2>Task 3: Transforms</h2>
 		<figure>
-			<img src="Figures/Task 3/my_robot.png" alt="My Robot, player for the Egyptian National Soccer Team!" style="width:50%"/>
+			<img src="Figures/Task 3/my_robot.png" alt="My Robot, cristiano ronaldo!" style="width:50%"/>
 			<figcaption>My Robot</figcaption>
 		</figure>
-		We changed the colors of the robot to match skin tone and jersey colors of the Egyptian National Soccer Team. We did hands at the side like a player waiting to take a freekick. We added the left and right arrows as hot keys to translate the figures left and right. 
+		<p>We changed the colors of the robot to match a soccer player waiting to take a free kick. We modified the hands to be at the waist of the player to mimic Cristiano Ronaldo's 
+			iconic pose before taking a free kick. We also added two small blocks representing "shoes" for the player, and scaled up the blocks representing the legs to 
+			visualize the appearance of shorts.</p>
 		
+		<p><b>Extra Credit:</b></p>
+		<p>
+		We added the left and right arrows as hot keys to translate the figure left and right as shown below. 
+		</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Task 3/Task4_Left.png" width="400px"/>
+				  <figcaption>Left translation. </figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="Figures/Task 3/Task4_Right.png" width="400px"/>
+				  <figcaption>Right translation. </figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 		
 		<h2>Task 4: Barycentric coordinates</h2>
 		<figure>
@@ -134,7 +183,11 @@
 			<figcaption>Color wheel. </figcaption>
 		</figure>
 		<p>
-		Barycentric coordinates describe the position of a point relative to the vertices of a triangle. This information is critical for creating smooth gradients between discrete points with different colors. With the information of where a point lies relative to the vertices of a triangle, we can equitably weight the colors of each vertex and sum to calculate the color of the point. We used this system previously for identifying points inside a triangle for rasterization, as the barycentric coordinates are required to sum to 1 in order for the point to be inside the triangle.  
+		Barycentric coordinates describe the position of a point relative to the vertices of a triangle. 
+		This information is critical for creating smooth gradients between discrete points with different colors. 
+		With the information of where a point lies relative to the vertices of a triangle, we can equitably weight the colors of each vertex and sum 
+		to calculate the color of the point. We used this system previously for identifying points inside a triangle for rasterization, as the barycentric coordinates 
+		are required to sum to 1 in order for the point to be inside the triangle.  
 		</p>
 		<figure>
 			<img src="Figures/Task 4/BaryCentricTriangle.png" alt="Default parameters" style="width:50%"/>
@@ -143,6 +196,7 @@
 		<p>
 			As seen above, barycentric coordinates allow for smooth, linear interpolations in space between discrete data points (the vertices) to determine color at pixels inside the triangle. 
 		</p>
+
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
 		<p>
 			To understand pixel sampling one must understand that there are two spaces, pixel space and texture space. Pixel space is what we see on the screen, while texture space is mapped from screen space to capture the texture of a 3D object in a 2D image. When sampling, we followed the same procedure for looping through points in pixel space and determining if the point was inside the triangle. Once that was confirmed, we calculated barycentric coordinates from the vertices
@@ -200,9 +254,9 @@
 		<h2>Task 6: "Level Sampling" with mipmaps for texture mapping</h2>
 		
 		<p> 
-			Level sampling involves selecting from downsampled textured spaces for certain parts of the image to prevent aliasing. If there is a large jump in texture space, we use low frequency data for these regions to smooth out the information and prevent aliasing between the pixels. However, not all regions of the image will 
-			require this level of treamtent. Therefore, we use mipmaps to selectively sample for different regions of the image based on frequency in the texture space. We implemented it by first determining the barycentric coordinates with respect to the pixel and the pixels directly above or directly to the right of it
-			These points and their barycentric coordinates were passed into our sample function, which now featured a check for the mipmap level. Our bilinear and nearest neighbor functions then parsed computed neighboring points to the points of interest in texture space based on the mipmap vector that contained widths, heights, and texels for each level.
+			Level sampling involves selecting from downsampled textured spaces for certain parts of the image to prevent aliasing. If there is a large jump in pixel space (i.e. change in percieved depth), we use low frequency data for these regions to smooth out the information and prevent aliasing between the pixels. However, not all regions of the image will 
+			require this level of treamtent. Therefore, we use mipmaps to selectively sample for different regions of the image based on frequency in the texture space. We implemented it by first determining the barycentric coordinates with respect to the pixel and the pixels directly above or directly to the right of it.
+			 These points and their barycentric coordinates are then passed into our sample function, which now featured a check for the mipmap level. Our bilinear and nearest neighbor functions then parsed computed neighboring points to the points of interest in texture space based on the mipmap vector that contained widths, heights, and texels for each level.
 		</p>
 		<p>
 			TODO: compare performance across sampling techniques, my computer keeps seg faulting so while I debug see if you can generate data
@@ -213,27 +267,32 @@
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="Figures/Task 6/Level_Zero_P_Nearest.png" width="400px"/>
-				  <figcaption>Bilinear with 1 sample per pixel.</figcaption>
+				  <figcaption> Zero level sampling with nearest pixel sampling and sample rate 1.</figcaption>
 				</td>
 				<td style="text-align: center;">
 				  <img src="Figures/Task 6/Level_Zero_P_Linear.png" width="400px"/>
-				  <figcaption>Bilinear with 16 samples per pixel.</figcaption>
+				  <figcaption>Zero level sampling with bilinear pixel sampling and sample rate 1.</figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="Figures/Task 6/Level_Nearest_P_Nearest.png" width="400px"/>
-				  <figcaption>Nearest with 1 sample per pixel.</figcaption>
+				  <figcaption>Nearest level sampling with nearest pixel sampling and sample rate 1.</figcaption>
 				</td>
 				<td style="text-align: center;">
 				  <img src="Figures/Task 6/Level_Nearest_P_Linear.png" width="400px"/>
-				  <figcaption>Nearest with 16 samples per pixel.</figcaption>
+				  <figcaption>Nearest level sampling with linear pixel sampling and sample rate 1.</figcaption>
 				</td>
 			  </tr>
 			</table>
 		</div>
-
-		<h2>Additional Notes (please remove)</h2>
+	</p>
+	<figure>
+		<img src="Figures/Task 6/Level_Visualization.png" alt="Default parameters" style="width:50%"/>
+		<figcaption>A visualization of the mipmap levels with black showing close to zero level and white showing close to max mipmap level. </figcaption>
+	</figure>
+	<p>
+		<!-- <h2>Additional Notes (please remove)</h2>
 		<ul>
 			<li>You can also add code if you'd like as so: <code>code code code</code></li>
 			<li>If you'd like to add math equations, 
@@ -243,6 +302,6 @@
 				</ul>
 			</li>
 		</ul>
-		</div>
+		</div> -->
 	</body>
 </html>
