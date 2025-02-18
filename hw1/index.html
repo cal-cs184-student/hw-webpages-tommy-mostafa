@@ -47,21 +47,20 @@
 		-->
 
 		<h2>Overview</h2>
-		This work implements a simple rasterizer 
+		 
 
-		TODO Add equations through out 
-
-		<p> TODO Do last when all is done. Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework. </p>
+		<p> TODO write a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework. </p>
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
-		Our team tried out two approaches. First, we rasterized by swapping coordinates of the vertices to force a counter-clockwise winding order. 
+		<p>Our team tried out two approaches. First, we rasterized by swapping coordinates of the vertices to force a counter-clockwise winding order. 
 		We then defined the bounding box and the dX and dY coordinates of each vertex. From there, we could easily calculate the point-in-triangle test of each coordinate in the bounding box. Any points on the edge were treated as if they were in the triangle.
 		To improve this for efficiency, we rewrote the conditionals to minimize evalutations whenever possible. We also removed the function to swap coordinates for the counter-clockwise winding order, and rewrote the math to handle both cases, separated by an if statement, again allowing for fewer operations. 
-		
-		Our algorithm was originally equally as efficient for checking each sample within a bounding box. By choosing the maximum and minimum x and y coordinates of the triangle and then rounding up for the maxima and down for the minima, we define the most spatially efficient rectangle to enclose the triangles.
+		</p>
+		<p>
+		Our search algorithm is equally as efficient for checking each sample within a bounding box. By choosing the maximum and minimum x and y coordinates of the triangle and then rounding up for the maxima and down for the minima, we define the most spatially efficient rectangle to enclose the triangles.
 		However, we improved on it by utilizing conditionals to identify points outside of the triangle as soon as possible, thus preventing unnecessary floating point operations. For example, instead of calculating the Point-in-Triangle test 3 times and then evaluating all 3 results at once, we evaluate each result after calculating, 
 		which can allow for early determination that a point is not in the triangle. 
-
+		</p>
 
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -91,14 +90,14 @@
 		<h2>Task 2: Antialiasing by Supersampling</h2>
 		
 
-		For the algorithm, we first had to update the sample buffer to be resized according to the sample rate, enabling storage for supersampling. We did not resize the framebuffer. Our algorithm had to be modified to step through pixels with the new dimensions we were sampling for, i.e. an increase by the square root of the super sampling rate in each dimension. 
+		<p>For the algorithm, we first had to update the sample buffer to be resized according to the sample rate, enabling storage for supersampling. We did not resize the framebuffer. Our algorithm had to be modified to step through pixels with the new dimensions we were sampling for, i.e. an increase by the square root of the super sampling rate in each dimension. 
 		We also did "block stepping", where we incremented through the matrix of pixel data in "blocks" that were representative of the supersampled pixels surrounding each real pixel. The color values of the supersampled pixels were averaged and then stored in the frame buffer for the real pixel. Ultimately, we were able to recycle the previous rasterization pipeline, only modifying the for loops to achieve block steps through the matrices and the sample buffer to allow for higher frequency sampling.
 		While there is some extra requirements for the memory and overhead to accurately increment through the matrices, the improvement in the image quality makes it worthwhile. 
 		Supersampling accomplishes improved quality by sampling across a finer mesh and then averaging it to the coarser pixel grid. This method reduces aliasing by capturing the higher frequency information that would otherwise be lost by only sampling at each pixel. This leads to a visually sharper image with fewer "jaggies".
-		
-
+		</p>
+		<p>
 		We can see below how the supersampling captures high frequency information, such as the corner of the red triangle. The long thin shape of the triangle is high frequency because of the sudden change from white to red to white. Sampling at the pixels is too low of a frequency and we lose information in the grid. While we do not perfectly capture the true shape of the triangle, we can at least identify more of the pixels that the triangle reaches, and downsample from high-resolution to low-resolution. 
-
+		</p>
 		
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -132,13 +131,21 @@
 		<h2>Task 4: Barycentric coordinates</h2>
 		<figure>
 			<img src="Figures/Task 4/Barycentric Color Gradient.png" alt="Default parameters" style="width:50%"/>
-			<figcaption>Test 7</figcaption>
+			<figcaption>Color wheel. </figcaption>
 		</figure>
-
-		Barycentric coordinates describe the position of a point relative to the vertices of a triangle. This information is critical for creating smooth gradients between discrete points with different colors. With the information of where a point lies relative to the vertices of a triangle, we can equitably weight the colors of each vertex and sum to calculate the color of the point. We used this system previously for identifying points inside a triangle for rasterization.  
-		
+		<p>
+		Barycentric coordinates describe the position of a point relative to the vertices of a triangle. This information is critical for creating smooth gradients between discrete points with different colors. With the information of where a point lies relative to the vertices of a triangle, we can equitably weight the colors of each vertex and sum to calculate the color of the point. We used this system previously for identifying points inside a triangle for rasterization, as the barycentric coordinates are required to sum to 1 in order for the point to be inside the triangle.  
+		</p>
+		<figure>
+			<img src="Figures/Task 4/BaryCentricTriangle.png" alt="Default parameters" style="width:50%"/>
+			<figcaption>Triangle with red, green, and blue corners to demonstrate the color gradients. </figcaption>
+		</figure>
+		<p>
+			As seen above, barycentric coordinates allow for smooth, linear interpolations in space between discrete data points (the vertices) to determine color at pixels inside the triangle. 
+		</p>
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
-		<p>understand pixel sampling one must understand that there are two spaces, pixel space and texture space. Pixel space is what we see on the screen, while texture space is mapped from screen space to capture the texture of a 3D object in a 2D image. When sampling, we followed the same procedure for looping through points in pixel space and determining if the point was inside the triangle. Once that was confirmed, we calculated barycentric coordinates from the vertices
+		<p>
+			To understand pixel sampling one must understand that there are two spaces, pixel space and texture space. Pixel space is what we see on the screen, while texture space is mapped from screen space to capture the texture of a 3D object in a 2D image. When sampling, we followed the same procedure for looping through points in pixel space and determining if the point was inside the triangle. Once that was confirmed, we calculated barycentric coordinates from the vertices
 		in pixel space and applied those to the vertices in texture space to find the coordinates of the point in texture space. With the coordinates, we called the sample function in the Texture struct. Nearest neighbor sampling simply looked to the closest point, the minimum of the Euclidean norm, in the texture space grid and filled in that texture color to the original point in pixel space. Bilinear sampling looks to the 4 nearest neighbors, which form a 2x2 grid around the 
 		point of interest. At these four points, we first linearly interpolate in the x-axis to find two interpolated texture colors, each at different y-coordinates but equal x-coordinates. Then, we interpolate the colors in y to find the color at the point of interest. For both sampling methods we relied on the get_texel function. 
 		</p> 
@@ -196,7 +203,9 @@
 			Level sampling involves selecting from downsampled textured spaces for certain parts of the image to prevent aliasing. If there is a large jump in texture space, we use low frequency data for these regions to smooth out the information and prevent aliasing between the pixels. However, not all regions of the image will 
 			require this level of treamtent. Therefore, we use mipmaps to selectively sample for different regions of the image based on frequency in the texture space. We implemented it by first determining the barycentric coordinates with respect to the pixel and the pixels directly above or directly to the right of it
 			These points and their barycentric coordinates were passed into our sample function, which now featured a check for the mipmap level. Our bilinear and nearest neighbor functions then parsed computed neighboring points to the points of interest in texture space based on the mipmap vector that contained widths, heights, and texels for each level.
-
+		</p>
+		<p>
+			TODO: compare performance across sampling techniques, my computer keeps seg faulting so while I debug see if you can generate data
 		</p>
 		
 		<div style="display: flex; flex-direction: column; align-items: center;">
