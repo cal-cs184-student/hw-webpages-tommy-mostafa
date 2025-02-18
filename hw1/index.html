@@ -86,7 +86,11 @@
 			  </tr>
 			</table>
 		</div>
-		TODO: EC -> add table of run times, need to run tommys old version and then current versipn for data
+		<h2>Extra Credit: </h2>
+		<figure>
+			<img src="Figures/Task 1/times.png" alt="Improvement in times in the new vs old implementation across files" style="width:50%"/>
+			<figcaption>Performance improvements for Task 1</figcaption>
+		</figure>
 		<h2>Task 2: Antialiasing by Supersampling</h2>
 		
 
@@ -134,7 +138,7 @@
 			<figcaption>Color wheel. </figcaption>
 		</figure>
 		<p>
-		Barycentric coordinates describe the position of a point relative to the vertices of a triangle. This information is critical for creating smooth gradients between discrete points with different colors. With the information of where a point lies relative to the vertices of a triangle, we can equitably weight the colors of each vertex and sum to calculate the color of the point. We used this system previously for identifying points inside a triangle for rasterization, as the barycentric coordinates are required to sum to 1 in order for the point to be inside the triangle.  
+		Barycentric coordinates describe the position of a point relative to the vertices of a triangle. They essentially describe linear interpolations relative to distances between vertices and a point of interest, which is critical for creating smooth gradients between different colors. We used this system previously for identifying points inside a triangle for rasterization, as the barycentric coordinates are required to sum to 1 in order for the point to be inside the triangle.  
 		</p>
 		<figure>
 			<img src="Figures/Task 4/BaryCentricTriangle.png" alt="Default parameters" style="width:50%"/>
@@ -145,7 +149,7 @@
 		</p>
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
 		<p>
-			To understand pixel sampling one must understand that there are two spaces, pixel space and texture space. Pixel space is what we see on the screen, while texture space is mapped from screen space to capture the texture of a 3D object in a 2D image. When sampling, we followed the same procedure for looping through points in pixel space and determining if the point was inside the triangle. Once that was confirmed, we calculated barycentric coordinates from the vertices
+			To understand pixel sampling one must understand that there are two spaces, pixel space and texture space. Pixel space is what we see on the screen, while texture space is mapped from pixel space to capture the texture of a 3D object in a 2D image. When sampling, we followed the same procedure for rasterization, looping through points in pixel space and determining if the point was inside the triangle. Once that was confirmed, we calculated barycentric coordinates from the vertices
 		in pixel space and applied those to the vertices in texture space to find the coordinates of the point in texture space. With the coordinates, we called the sample function in the Texture struct. Nearest neighbor sampling simply looked to the closest point, the minimum of the Euclidean norm, in the texture space grid and filled in that texture color to the original point in pixel space. Bilinear sampling looks to the 4 nearest neighbors, which form a 2x2 grid around the 
 		point of interest. At these four points, we first linearly interpolate in the x-axis to find two interpolated texture colors, each at different y-coordinates but equal x-coordinates. Then, we interpolate the colors in y to find the color at the point of interest. For both sampling methods we relied on the get_texel function. 
 		</p> 
