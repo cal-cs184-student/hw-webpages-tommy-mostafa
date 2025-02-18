@@ -75,7 +75,7 @@
 		<p>
 		To improve this for efficiency, we tried another approach by rewriting the conditionals that evaluate the point in triangle tests by sequentially checking each dot product between the center of the pixel
 		and the three vertices instead of checking all three at once. We also removed the function to swap coordinates for the counter-clockwise winding order by calculating the signed area as  \( A = 0.5 \times \left( x_1 \cdot y_2 + x_2 \cdot y_3 + x_3 \cdot y_1 - y_1 \cdot x_2 - y_2 \cdot x_3 - y_3 \cdot x_1 \right) \), 
-		where \( A > 0 \) indicates counter clockwise winding and \( A < 0 \) indicates clockwise winding. We explicitly rewrote the math to handle both cases, separated by an if statement, to again allow for fewer operations. The table below shows the difference in run time between the two algorithms.
+		where \( A > 0 \) indicates counter clockwise winding and \( A < 0 \) indicates clockwise winding. We explicitly rewrote the math to handle both cases, separated by an if statement, to again allow for fewer operations. The figure below shows the difference in run time between the two algorithms.
 		</p>
 		<p>
 		Our search algorithm is equally as efficient for checking each sample within a bounding box. By choosing the maximum and minimum x and y coordinates of the triangle and then rounding up for the maxima and down for the minima, we define the most spatially efficient rectangle to enclose the triangles.
@@ -107,10 +107,10 @@
 			  </tr>
 			</table>
 		</div>
-		<h2>Extra Credit: </h2>
+		
 		<figure>
 			<img src="Figures/Task 1/times.png" alt="Improvement in times in the new vs old implementation across files" style="width:50%"/>
-			<figcaption>Performance improvements for Task 1</figcaption>
+			<figcaption>Performance improvements for Task 1. </figcaption>
 		</figure>
 		<h2>Task 2: Antialiasing by Supersampling</h2>
 		<p>
