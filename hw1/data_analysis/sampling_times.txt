@@ -1,0 +1,17 @@
+1 pixel
+
+zero: 6   7.3
+nearest: 8.7 10.4
+linear: 10.3 10.5
+
+4 pixel
+
+zero: 19   24
+nearest: 30  37
+linear: 36  53
+
+16 pixel
+
+zero: 70   93
+nearest: 117 143
+linear: 139 207

@@ -261,9 +261,15 @@
 			Level sampling involves selecting from downsampled textured spaces for certain parts of the image to prevent aliasing. If there is a large jump in pixel space (i.e. change in percieved depth), we use low frequency data for these regions to smooth out the information and prevent aliasing between the pixels. However, not all regions of the image will 
 			require this level of treamtent. Therefore, we use mipmaps to selectively sample for different regions of the image based on frequency in the texture space. We implemented it by first determining the barycentric coordinates with respect to the pixel and the pixels directly above or directly to the right of it.
 			 These points and their barycentric coordinates are then passed into our sample function, which now featured a check for the mipmap level. Our bilinear and nearest neighbor functions then parsed computed neighboring points to the points of interest in texture space based on the mipmap vector that contained widths, heights, and texels for each level.
+			 When determining which miplevel to select from, zero defaulted to full resolution, nearest rounded the calculated level to the nearest integer, and linear performs a linear interpolation on the data in the surrounding levels. 
 		</p>
+		<figure>
+			<img src="Figures/Task 6/sampling_times.png" alt="Default parameters" style="width:100%"/>
+			<figcaption>Sampling times for the methods. </figcaption>
+		</figure>
 		<p>
-			TODO: compare performance across sampling techniques, my computer keeps seg faulting so while I debug see if you can generate data
+		In the figure above we see performance across the various combinations of the sampling methods. As expected, bilinear sampling pixel sampling of the linearly sampled miplevel was the most expensive as this combines the most computationally expensive methods. With regards to antialiasing, pixel sampling seemed to make the greatest difference when comparing 
+		zoomed in portions of the textured image. Supersampling and level sampling did not make nearly as much of a difference visually. 
 		</p>
 		
 		<div style="display: flex; flex-direction: column; align-items: center;">
@@ -285,7 +291,7 @@
 				</td>
 				<td style="text-align: center;">
 				  <img src="Figures/Task 6/Level_Nearest_P_Linear.png" width="400px"/>
-				  <figcaption>Nearest level sampling with linear pixel sampling and sample rate 1.</figcaption>
+				  <figcaption>Nearest level sampling with bilinear pixel sampling and sample rate 1.</figcaption>
 				</td>
 			  </tr>
 			</table>
