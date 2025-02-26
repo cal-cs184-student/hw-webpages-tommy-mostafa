@@ -32,11 +32,11 @@
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: (TODO) <a href="https://cal-cs184-student.github.io/hw-webpages-tommy-mostafa/">cs184.eecs.berkeley.edu/sp25</a>
 
 		<br>
 		
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to GitHub repository: (TODO) <a href="https://github.com/cal-cs184-student/sp25-hw1-egypt-usa/">cs184.eecs.berkeley.edu/sp25</a>
 
 		<figure>
 			<img src="teapot.png" alt="Teapot" style="width:50%"/>
@@ -53,29 +53,46 @@
 		<h2>Section I: Bezier Curves and Surfaces</h2>
 
 		<h3>Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		de Casteljau's algorithm accepts 2 inputs, a parameter t, which is bounded between 0 and 1, and a list of n points. In Part 1 each point lives in 2D space. We perform a linear interpolation between each neighboring set of points to produce a list of n-1 points. We then call the algorithm again, repeatedly decreasing the list size until we reach 1 point. This final point lives on the Bezier curve. The recursive procedure must be repeated for 
+		as many points of t as necessary to construct a smooth curve. In our algorithm, we loop through values of t in increments of .005. The small steps lead to a sufficiently smooth curve. At each t, we loop through evalute_step n-1 times for n control points. This loop gets us down to the final level, or the point on the curve, which is then appended to a list of points representing the curve. Once the t loop finishes after calculating for t=1, we have a Bezier curve.
 
 		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="images/Sec1_Part1/S1P1_1click.png" width="400px"/>
+				  <figcaption>First interpolation of control points.</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="images/Sec1_Part1/S1P1_2click.png" width="400px"/>
+				  <figcaption>2 interpolations.</figcaption>
 				</td>
-			  </tr>
-			  <tr>
+			</tr>
+			<tr>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="images/Sec1_Part1/S1P1_3click.png" width="400px"/>
+				  <figcaption>3 interpolations.</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="images/Sec1_Part1/S1P1_4click.png" width="400px"/>
+				  <figcaption>4 interpolations.</figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: center;">
+					<img src="images/Sec1_Part1/S1P1_nocurve.png" width="400px"/>
+					<figcaption>Every interpolation without the curve.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="images/Sec1_Part1/S1P1_everything.png" width="400px"/>
+				  <figcaption>Every interpolation and the curve.</figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: center;">
+				  <img src="images/Sec1_Part1/S1P1_secondcurve.png" width="400px"/>
+				  <figcaption>Another curve that was toggled.</figcaption>
 				</td>
 			  </tr>
 			</table>
