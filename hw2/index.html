@@ -32,15 +32,15 @@
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cal-cs184-student.github.io/hw-webpages-tommy-mostafa/">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: (TODO) <a href="https://cal-cs184-student.github.io/hw-webpages-tommy-mostafa/">https://cal-cs184-student.github.io/hw-webpages-tommy-mostafa/</a>
 
 		<br>
 		
-		Link to GitHub repository: (TODO) <a href="https://github.com/cal-cs184-student/sp25-hw1-egypt-usa/">cs184.eecs.berkeley.edu/sp25</a>
+		Link to GitHub repository: (TODO) <a href="https://github.com/cal-cs184-student/sp25-hw1-egypt-usa/">https://github.com/cal-cs184-student/sp25-hw1-egypt-usa/</a>
 
 		<figure>
-			<img src="teapot.png" alt="Teapot" style="width:50%"/>
-			<figcaption>You can add images with captions!</figcaption>
+			<img src="images/teapot.png" alt="Teapot" style="width:50%"/>
+			<!-- <figcaption>You can add images with captions!</figcaption> -->
 		</figure>
 
 		<!--
@@ -128,9 +128,9 @@
 		</div>
 		
 		<h3>Part 4: Edge flip</h3>
-		To implement the flip operation we first need to understand the HalfEdgeIter, FaceIter, EdgeIter, and VertexIter. We then redrew the image in lecture 8, tracking what changed for each iterator.  
+		To implement the flip operation we first need to understand the <code>HalfEdgeIter</code>, <code>FaceIter</code>, <code>EdgeIter</code>, and <code>VertexIter</code>. We then redrew the image in lecture 8, tracking what changed for each iterator.  
 		<div style="display: flex; flex-direction: column; align-items: center;">
-			<img src="images/Sec2_Part4/drawing.jpeg" alt="Drawing" style="width:50%"/>
+			<img src="images/Sec2_Part4/Schematic Flip.jpg" alt="Drawing" style="width:50%"/>
 			<figcaption>Drawing illustrating the edge flip operation.</figcaption>
 		</div>
 
@@ -174,15 +174,195 @@
 
 
 		<h3>Part 5: Edge split</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Edge splitting requires an input of an edge iterator and outputs a new vertex and three new edges where the split happens. A schematic of this 
+		operation is shown below.
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<img src="images/Sec2_Part4/Schematic.png" alt="Drawing" style="width:70%"/>
+			<figcaption>A schematic of the split operation showing the original triangle on the left and the new split triangle on the right.</figcaption>
+		</div>
+		
+		<p>To achieve a correct split we need to assign new pointers to the vertex <code>v4</code>, the edges <code>e5</code>, <code>e6</code>, and <code>e7</code>,
+			the faces <code>f2</code> and <code>f3</code> and the half edges <code>h10</code>, <code>h11</code>, <code>h12</code>, <code>h13</code>, <code>h14</code>, 
+			and <code>h15</code> shown in the schematic above. The rest of the iterators are then updated accordingly. This was relatively straightforward to 
+			implement and, thankfully, did not require further debugging beyond simple errors. The figures below show the edge split
+			operation alone and in combination with edge flips.</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part5/Edgesplit1.png" width="400px"/>
+						<figcaption>Before edge split.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part5/Edgesplit2.png" width="400px"/>
+						<figcaption>Edge split 1.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part5/Edgesplit2.png" width="400px"/>
+						<figcaption>The same edge split before more split and flip operations. </figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part5/Edgesplit3.png" width="400px"/>
+						<figcaption>The teapot after several edge split and flip operations.  </figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
 
 		<h3>Part 6: Loop subdivision for mesh upsampling</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-		<h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
+		Loop subdivision is an interesting process for upsampling a mesh that was rather involved to implement. To achieve Loop subdivision, we followed the 
+		steps below:
 		
+		<ul>
+			<li> Started by looping through all vertices of the original mesh to compute their respective degrees 
+				and neighbor position sums to store the original vertex updates in temperorary 
+				<code>newPosition</code> attributes of each vertex.</li>
+			<li> Loop through all original mesh edges to compute the updated locations of the new vertices 
+				(the vertices that will be inserted after each split) by using the positions of the vertices of the current edge's 
+				halfedge, its twin, its <code>next()->next()</code>, and its twin's <code>next()->next()</code>. Also tag all of these edges as "old" edges. </li>
+			<li> Loop through all edges of the original mesh again to store all original edges in a vector. </li>
+			<li> Loop through all elements of that vector to safely split each edge without the risk of an infinite loop. </li>
+			<li> Loop through all current edges and flip edges that are newly added that also connect a new and an old vertex.</li>
+			<li> Loop through all current vertices, and check whether or not a vertex is new and update their positions accordingly. </li>
+		</ul>
+
+		<p>One diffculty we faced with such an approach was keeping track of new and old vertices and edges. We solved this by updating our edgeSplit operation to 
+			tag the new vertices and edges as they get created. We also had to be careful not to tag original edges that get split into two as "new" edges. The other diffculty
+			was updating the positions of the newly added vertices. Unlike the old vertices, the new vertices do not have a newPosition temporarily stored for further 
+			processing. Instead these positions are stored in the original edges that get split in half which may or may not be the halfedges associated with the new vertices (see figure 
+			below for a screenshot of this bug). We fixed this issue by assigning the newPosition attribute of the newly added vertex to be that of the original edge in the splitEdge function. </p>
+		
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<img src="images/Sec2_Part6/Bug.png" alt="Drawing" style="width:50%"/>
+			<figcaption>Vertex update bug.</figcaption>
+		</div>
+		
+		<p>The figures below contrast the behavior of the torus mesh after some steps of loop subdivision with and without edge presplitting. The sharp corners and edges get smoother after each 
+			step of subdivision without edge presplitting. With presplitting, however, the sharp corners and edges are still pronounced in the subdivided mesh. This 
+		can perhaps be explained by the idea that adding more elements before subdivision further enhances the ability of subdivision to capture the true shape of the object. </p> 
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Torus1.png" width="400px"/>
+						<figcaption>Original no pre splitting.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Torus_presplit_1.png" width="400px"/>
+						<figcaption>Original with presplitting.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Torus2.png" width="400px"/>
+						<figcaption>Step 1 no pre splitting.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Torus_presplit_2.png" width="400px"/>
+						<figcaption>Step 1 with presplitting.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Torus3.png" width="400px"/>
+						<figcaption>Step 2 no pre splitting.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Torus_presplit_3.png" width="400px"/>
+						<figcaption>Step 2 with presplitting.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Torus4.png" width="400px"/>
+						<figcaption>Step 3 no pre splitting.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Torus_presplit_4.png" width="400px"/>
+						<figcaption>Step 3 with presplitting.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Torus5.png" width="400px"/>
+						<figcaption>Step 4 no pre splitting.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Torus_presplit_5.png" width="400px"/>
+						<figcaption>Step 4 with presplitting.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+			
+		<!-- <h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. -->
+		<p>The cube shows asymmetric subdivision with each step. This effect can be alleviated by performing some pre splitting and flipping to try to have an originally 
+			symmetric shape. This symmetric original shape, which is finer than the original mesh, can better capture the shape of the cube during subdivisions as shown below.
+		</p>
+		
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Cube1.png" width="400px"/>
+						<figcaption>Original no pre splitting.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Cube1_presplit.png" width="400px"/>
+						<figcaption>Original with presplitting.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Cube2.png" width="400px"/>
+						<figcaption>Step 1 no pre splitting.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Cube2_presplit.png" width="400px"/>
+						<figcaption>Step 1 with presplitting.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Cube3.png" width="400px"/>
+						<figcaption>Step 2 no pre splitting.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Cube3_presplit.png" width="400px"/>
+						<figcaption>Step 2 with presplitting.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Cube4.png" width="400px"/>
+						<figcaption>Step 3 no pre splitting.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Cube4_presplit.png" width="400px"/>
+						<figcaption>Step 3 with presplitting.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Cube5.png" width="400px"/>
+						<figcaption>Step 4 no pre splitting.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part6/Cube5_presplit.png" width="400px"/>
+						<figcaption>Step 4 with presplitting.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+
+
 		</div>
 	</body>
 </html>
