@@ -99,15 +99,79 @@
 		</div>
 
 		<h3>Part 2: Bezier surfaces with separable 1D de Casteljau</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		The extension from curves to surfaces is quite intuitive. We now have an nxn grid of control points. First, apply de Casteljau in 1 dimension of this grid, with a parameter u for controlling the interpolation. This returns the points on n Bezier curves. However, thes Bezier curves are not on our final Bezier surface. We then apply de Casteljau on these n points, interpolation is controlled by parameter v, giving the final point that is a part of the Bezier surface.
+		For our algorithm, we evaluate the control points one row at a time. We progress through the rows one pair at a time, lerping down until we have a single point for the row. With these new control points, lerp down the column until we have a single point for the surface. We repeat this process for different values of u and v, incrementing one at a time in values of 1/n. 
+		<figure>
+			<img src="images/Sec1_Part2/S1P2_teapot.png" alt="Teapot Surface" style="width:50%"/>
+			<figcaption>Bezier surface of a teapot.</figcaption>
+		</figure>
 
 		<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
 		<h3>Part 3: Area-weighted vertex normals</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
+		For implementing the area-weighted vertex normals, we first looped through all faces rooted to a vertex, skipping over any faces on a boundary. We then used the positions of the two other vertices on this face to plug into the following equation: \[ 0.5 * || p_i \times p_j ||_2  \] where \( p_i \) and \(p_j \) are the positions. This solved for the face area. We summed all face areas and all face areas, \(A_i\): \[ \sum_i A_i \] and all face areas times the normal at each face, \(n_i\):
+		\[ \sum_i A_i n_i\] Once all faces have been iterated through, divide the two sums for the area weighted vertex normal: \[ \frac{\sum_i A_i n_i}{\sum_i A_i}\]
+		
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part3/S2P3_phong.png" width="400px"/>
+						<figcaption>With Phong shading.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part3/S2P3_nophong.png" width="400px"/>
+						<figcaption>Without Phong shading.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		
 		<h3>Part 4: Edge flip</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		To implement the flip operation we first need to understand the HalfEdgeIter, FaceIter, EdgeIter, and VertexIter. We then redrew the image in lecture 8, tracking what changed for each iterator.  
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<img src="images/Sec2_Part4/drawing.jpeg" alt="Drawing" style="width:50%"/>
+			<figcaption>Drawing illustrating the edge flip operation.</figcaption>
+		</div>
+
+		EdgeIters only point to their respective halfedge, so there is no need to do any EdgeIter updates as seen in the drawing so long as we update the HalfEdgeIters. A0 and B0 pick up the vertices from B2 and A2, respectively. B1 and A1 swap faces. Every halfedge points to a different halfedge. This was for the HalfEdgeIters. We then updated the VertexIters and FaceIters to point to their new halfedges. When we forgot to update the FaceIters, a gap formed in the teapot the second time an edge was flipped. We realized something must be wrong with the faces and caught the bug.
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part4/noflip.png" width="400px"/>
+						<figcaption>Before edge flip.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part4/firstflip.png" width="400px"/>
+						<figcaption>Edge flip 1.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part4/secondflip.png" width="400px"/>
+						<figcaption>Edge flip 2. We see a dent form because we flipped an edge that was a part of a curve along the teapot.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part4/thirdflip.png" width="400px"/>
+						<figcaption>Edge flip 3. This edge became degenerate as it had no vertices to flip to. </figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part4/fourthflip.png" width="400px"/>
+						<figcaption>Edge flip 4. The dent grows.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="images/Sec2_Part4/fifthflip.png" width="400px"/>
+						<figcaption>Edge flip 5.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+			
+
+
 
 		<h3>Part 5: Edge split</h3>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -118,16 +182,7 @@
 		<h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+		
 		</div>
 	</body>
 </html>
