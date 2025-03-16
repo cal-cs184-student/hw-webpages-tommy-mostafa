@@ -28,15 +28,15 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Spring 2025 Homework 3 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">Names: Mostafa Sedky and Tommy Hosmer</div>
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-tommy-mostafa/">https://cal-cs184-student.github.io/hw-webpages-tommy-mostafa/</a>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/sp25-hw3-sonic/">https://github.com/cal-cs184-student/sp25-hw3-sonic/</a>
 		
 		<figure>
-			<img src="cornell.png" alt="Cornell Boxes with Bunnies" style="width:70%"/>
+			<img src="./images/cornell.png" alt="Cornell Boxes with Bunnies" style="width:70%"/>
 			<figcaption>You can add images with captions!</figcaption>
 		</figure>
 
@@ -48,37 +48,60 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Ray Generation: We first converted the pixel coordinates to camera coordinates. \[ x*(2*tan(hFov * 0.5)) - tan(hFov * 0.5) \] \[ y*(2*tan(vFov * 0.5)) - tan(vFov * 0.5) \] 
+		We then fixed the minimum and maximum t values of the ray to nClip and fClip, respectively. The ray direction was simply the coordinates normalized since the origin was at (0,0,0). The direction was rotated with the c2w matrix and the origin was translated to pos.
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+		Primitive Intersection: We first initialized a counter as we made "number of samples" many loops through the pixel. Each sample in the pixel had the coordinates randomly drawn from a uniform distribution between 0 and 1, and then normalized to the buffer coordinates to fit in the image coordinate frame before being passed into generate_ray. 
+		The irradiance of the pixel was added to a counter vector; the counter vector was normalized by the number of samples after the loop and the corresponding color was updated to the sample buffer.
+
+		Triangle Intersection: In the lecture slides a linear algebra problem was described in the form of Mx = b. In has_intersection we simply set up and solve this for x. The 3 values in x, time of intersection and 2 of the 3 barycentric coordinates, give us all the information needed to confirm a triangle intersection in the bounds of the time frame. In intersect, we check for an 
+		intersection, solve the same values as before, and then use them to update the intersection structure.
+
+		
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
+				  <img src="./images/banana.png" width="400px"/>
 				  <figcaption>Caption goes here.</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="./images/building.png" width="400px"/>
+				  <figcaption>M.</figcaption>
 				</td>
 			  </tr>
 			</table>
 		</div>
 		
 		<h2>Part 2: Bounding Volume Hierarchy</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
+		BVH Construction Algorithm: The algorithm is recursive, with the base occurring when the difference between the start and end of the list of primitives is less than or equal to the maximum leaf size. In this case we store all primitives in a new bounding box and then initialize the start and end pointers so that the structur is recognized as a leaf node. 
+		For root nodes, we collect all the primitives into a bounding box and calculate the distance encompassed across each coordinate dimension. The largest of these dimensions is what we divide along. We then sort the primitives based on where they lie relative to the centroid of this axis. This sorted list is then divided in half to form two bounding boxes; these bounding boxes are then used to form two new child BVHNodes. 
+		We recursively call the construct_bvh function on the left and right child nodes. Return the BVHNode with pointers to left and right child nodes, indicating it is a root node.
+		
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="./images/wall-e.png" width="400px"/>
+				  <figcaption>Caption goes here.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="./images/maxplanck.png" width="400px"/>
+				  <figcaption>M.</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="./images/dragon.png" width="400px"/>
+				  <figcaption>Dragon.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="./images/blob.png" width="400px"/>
+				  <figcaption>Blob.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 		<h2>Part 3: Direct Illumination</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
