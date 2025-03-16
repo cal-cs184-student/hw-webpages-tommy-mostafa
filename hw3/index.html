@@ -28,16 +28,17 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Spring 2025 Homework 3 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">Names: Mostafa Sedky & Thomas Hosmer </div>
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-tommy-mostafa/hw3/index.html">https://cal-cs184-student.github.io/hw-webpages-tommy-mostafa/hw3/index.html</a>
+		<br>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/sp25-hw3-sonic.git">https://github.com/cal-cs184-student/sp25-hw3-sonic.git</a>
 		
 		<figure>
 			<img src="cornell.png" alt="Cornell Boxes with Bunnies" style="width:70%"/>
-			<figcaption>You can add images with captions!</figcaption>
+			<!-- <figcaption>You can add images with captions!</figcaption> -->
 		</figure>
 
 		<!--
@@ -45,7 +46,11 @@
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		This work develops a path tracer with direct illumination, global illumination, and adaptive sampling. To do this, we set up 
+		a ray generation workflow that uses coordinate transforms to set up the locations of the ray, the camera, and the scene in space. 
+		We also setup a workflow for fast ray triangle intersection checks as well as bounding volume hierarchies for accelerated 
+		ray tracing. We also experiment with hemisphere sampling and direct light sampling for tracing the directions of reflected lights from a surface.
+		We finally test the effects of direct and indirect illumination and depth of ray bounces.
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -80,10 +85,392 @@
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 		<h2>Part 3: Direct Illumination</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+			Direct illumination refers to the light that reflects off a surface due to illumination from a light source. To this for a render, 
+			one can trace each ray from the camera to check for intersections with a surface in the scene. Once an intersection is found,  
+			one can sample a hemisphere around the intersection point to generate a direction and check for an intersection with a light source using that 
+			intersection point and direction. Alternatively, one can directly sample the light sources in the scene to check for direct, unobstructed paths between the 
+			intersection point and light sources. The latter approach is very helpful for point sources where the chance of finding an intersection with them
+			with hemisphere sampling is very small. </p>
+		
+		<p>To implement hemisphere sampling, we follow the steps below:</p>
+		
+		<ul>
+			<li> Locate an intersection point between a camera ray and an object in the scene. </li>
+			<li> Loop through the desired number of samples at each pixel .</li>
+			<li> For each sample, generate a direction <code> wi </code> with probability \( \frac{1}{2 \pi} \) over a hemisphere. </li>
+			<li> Generate a ray using that direction (in world coordinates) and the original intersection point and check for 
+				intersections with another object in the scene. </li>
+			<li> If the intersection is a light source then add and accumulate the reflectance of the intersection point based on the surface
+				emission incoming ray direction and probability density function. </li>
+		</ul>
+
+		To implement light (importance) sampling, we follow the steps below:
+		<ul>
+			<li> Locate an intersection point between a camera ray and an object in the scene. </li>
+			<li> Loop through the light sources in the scene.</li>
+			<li> Determine whether the light source is a point source, and update the number of samples accordingly 
+				(by using one sample for a light source). </li>
+			<li> Generate a ray using a light sampled direction (in world coordinates) and the original intersection point and check for 
+				intersections with another object in the scene. </li>
+			<li> If the ray does not intersect with other objects in the scene then update the reflectance of the intersection point accordingly. </li>
+		</ul>
+
+		<p>The images below show some renders with both implementations of direct lighting.</p>
+		 
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 3/part3_bunny_64_32_hemiSampling.png" width="400px"/>
+				  <figcaption>Bunny with 64 samples per pixel, 32 light rays, and hemisphere sampling.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 3/part3_bunny_64_32_lightSampling.png" width="400px"/>
+				  <figcaption>Bunny with 64 samples per pixel, 32 light rays, and light sampling.</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 3/part3_spheres_64_32_hemiSampling.png" width="400px"/>
+				  <figcaption>Spheres with 64 samples per pixel, 32 light rays, and hemisphere sampling.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 3/part3_spheres_64_32_lightSampling.png" width="400px"/>
+				  <figcaption>Spheres with 64 samples per pixel, 32 light rays, and light sampling.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+		
+		<br>
+
+		<p>Below is a comparison of the noise levels in soft shadows in the Cornell Box Bunny for different numbers of light rays using light sampling
+			and one sample per pixel. We see much lower noise in the cast shadow below the bunny for increasing light rays as we would expect.</p>	
+
+		<br>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 3/part3_bunny_1_1_lightSampling.png" width="400px"/>
+				  <figcaption>1 light ray.</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 3/part3_bunny_1_4_lightSampling.png" width="400px"/>
+					<figcaption>4 light rays.</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+					<img src="Figures/Part 3/part3_bunny_1_16_lightSampling.png" width="400px"/>
+					<figcaption>16 light rays.</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 3/part3_bunny_1_64_lightSampling.png" width="400px"/>
+					<figcaption>64 light rays.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<p>The figures shown in this section show a staggering difference between hemisphere and light sampling for the same parameters (samples 
+			per pixel and number of light rays). There is almost no noticeable noise in the renders created by light sampling whereas significant noise
+			can be seen in the renders made by hemisphere sampling. This is because hemisphere sampling randomly looks for the light source over a hemisphere
+		and thus has a much smaller chance of illuminating a pixel compared to light sampling. We thus get clearer renders for the same parameters with 
+		light sampling. If, however, there are many, large area light sources in the scene, it can be more efficient to do hemisphere sampling. 
+	</p>
+
+
 
 		<h2>Part 4: Global Illumination</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Global illumination refers to the light that reflects off a surface due to illumination from a nearby surface that is also reflecting light. 
+		To this for a render, one can recursively follow the same steps used for direct illumination by inversely tracing the path of a ray as it bounces
+		around objects and accumulate the reflectance of the intersection point in the process. </p>
+		
+		<p>To implement this, we follow the steps below:</p>
+		
+		<ul>
+			<li> Locate an intersection point between a camera ray with depth equal to <code>max_ray_depth</code> and an object in the scene. </li>
+			<li> Calculate the direct lighting of that point just like in Part 3.  </li>
+			<li> Check if ray depth is greater than one.</li>
+			<li> If Russian Roulette stopping is added, check for probability of exiting here. </li>
+			<li> Generate a ray using that direction (in world coordinates) and the intersection point and check for 
+				intersections with another object in the scene. Also decrement the depth of the ray. </li>
+			<li> Accumulate reflectance (and check for <code>isAccumBounces</code> as well for adding the indirect light). Make sure 
+			reflectance is normalized by continuation probability. </li>
+			<li> Recursively call the function until ray depth is equal to 1 or russian roulette probability stop. </li>
+		</ul>
+
+		<p>Below are some images rendered with global (direct and indirect) illumination. </p>
+<br>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m5_p1.png" width="400px"/>
+				  <figcaption>Bunny global illumination render with 1024 samples per pixel, 4 light rays, and max_ray_depth of 5.</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_dragon_1024_4_m5_p1.png" width="400px"/>
+					<figcaption>Dragon global illumination render with 1024 samples per pixel, 4 light rays, and max_ray_depth of 5.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+<br> <br>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_spheres_1024_4_m5_p1.png" width="400px"/>
+					<figcaption>Spheres global illumination render with 1024 samples per pixel, 4 light rays, and max_ray_depth of 5.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<br>
+		<p>We illustrate a comparison between only direct and only indirect illumination in the figure below.</p>
+		<br>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_spheres_1024_4_m1_p2_directIllum.png" width="400px"/>
+				  <figcaption>Spheres with 1024 samples per pixel, 4 light rays, and direct illumination only.</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_spheres_1024_4_m2_p2_indirectIllum.png" width="400px"/>
+					<figcaption>Spheres with 1024 samples per pixel, 4 light rays, and indirect illumination only.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<br>
+		<p>We also illustrate a comparison between only direct and only indirect illumination for multiple max_ray_depths 
+			for <code>isAccumBounces=false</code> and <code>isAccumBounces=true</code> in the figure below. All images below use 1024 samples 
+		per pixel and 4 light rays. We see for the right column (where <code>isAccumBounces=true</code>) of images a sequentially brighter image
+	for each extra bounce of light. The column on the left, however,  (where <code>isAccumBounces=false</code>) simulataneously gets sequentially
+	darker for each bounce of light. This is because the effect of indirect lighting gets smaller for more bounces of light, which results
+	in diminishing returns. The most noticeable difference is seen between the first and second bounces of light. After that, the difference between the
+second and third bounces is not as noticeable in the globally illuminated images on the right as evidenced by the corresponding much darker image on
+the left (which only shows the indirect lighting at that depth).</p>
+		<br>
+
+		<!-- <div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m0_o0_p3.png" width="400px"/>
+				  <figcaption>m = 0, <code>isAccumBounces=false</code></figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m1_o0_p3.png" width="400px"/>
+					<figcaption>m = 1, <code>isAccumBounces=false</code></figcaption>
+				  </td>
+				  <td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m2_o0_p3.png" width="400px"/>
+					<figcaption>m = 2, <code>isAccumBounces=false</code></figcaption>
+				  </td>
+				  <td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m3_o0_p3.png" width="400px"/>
+					<figcaption>m = 3, <code>isAccumBounces=false</code></figcaption>
+				  </td>
+				  <td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m4_o0_p3.png" width="400px"/>
+					<figcaption>m = 4, <code>isAccumBounces=false</code></figcaption>
+				  </td>
+				  <td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m5_o0_p3.png" width="400px"/>
+					<figcaption>m = 5, <code>isAccumBounces=false</code></figcaption>
+				  </td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m0_o1_p3.png" width="400px"/>
+				  <figcaption>m = 0, <code>isAccumBounces=true</code></figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m1_o1_p3.png" width="400px"/>
+					<figcaption>m = 1, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+				  <td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m2_o1_p3.png" width="400px"/>
+					<figcaption>m = 2, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+				  <td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m3_o1_p3.png" width="400px"/>
+					<figcaption>m = 3, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+				  <td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m4_o1_p3.png" width="400px"/>
+					<figcaption>m = 4, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+				  <td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m5_o1_p3.png" width="400px"/>
+					<figcaption>m = 5, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+			  </tr>
+			</table>
+		</div> -->
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m0_o0_p3.png" width="400px"/>
+				  <figcaption>m = 0, <code>isAccumBounces=false</code></figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m0_o1_p3.png" width="400px"/>
+					<figcaption>m = 0, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+			</tr>
+			<tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m1_o0_p3.png" width="400px"/>
+				  <figcaption>m = 1, <code>isAccumBounces=false</code></figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m1_o1_p3.png" width="400px"/>
+					<figcaption>m = 1, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+			</tr>
+			<tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m2_o0_p3.png" width="400px"/>
+				  <figcaption>m = 2, <code>isAccumBounces=false</code></figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m2_o1_p3.png" width="400px"/>
+					<figcaption>m = 2, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+			</tr>
+			<tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m3_o0_p3.png" width="400px"/>
+				  <figcaption>m = 3, <code>isAccumBounces=false</code></figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m3_o1_p3.png" width="400px"/>
+					<figcaption>m = 3, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+			</tr>
+			<tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m4_o0_p3.png" width="400px"/>
+				  <figcaption>m = 4, <code>isAccumBounces=false</code></figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m4_o1_p3.png" width="400px"/>
+					<figcaption>m = 4, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+			</tr>
+			<tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m5_o0_p3.png" width="400px"/>
+				  <figcaption>m = 5, <code>isAccumBounces=false</code></figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m5_o1_p3.png" width="400px"/>
+					<figcaption>m = 5, <code>isAccumBounces=true</code></figcaption>
+				  </td>
+			</tr>
+			</table>
+		</div>
+
+<br><br>
+		<p>We also show the effect of Russian Roulette rendering approach for different max_ray_depth values. The probability of stopping is set at 0.3, and 
+			we use 1024 samples per pixel and 4 light rays for all generated images below.  
+	</p>
+	<br><br>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m0_o1_RR_p4.png" width="400px"/>
+				  <figcaption>m = 0</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m1_o1_RR_p4.png" width="400px"/>
+					<figcaption>m = 1</figcaption>
+				  </td>
+				<td style="text-align: center;">
+				<img src="Figures/Part 4/part4_bunny_1024_4_m2_o1_RR_p4.png" width="400px"/>
+				<figcaption>m = 2</figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_bunny_1024_4_m3_o1_RR_p4.png" width="400px"/>
+				  <figcaption>m = 3</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_bunny_1024_4_m4_o1_RR_p4.png" width="400px"/>
+					<figcaption>m = 4</figcaption>
+				  </td>
+				<td style="text-align: center;">
+				<img src="Figures/Part 4/part4_bunny_1024_4_m100_o1_RR_p4.png" width="400px"/>
+				<figcaption>m = 100</figcaption>
+				</td>
+			</tr>
+			</table>
+		</div>
+
+		<br><br>
+		<p>We finally also compare rendered views for various sample per pixel rates and 4 light rays below (with Russian Roulette stopping probability 
+			of 0.3).  
+	</p>
+
+	<br><br>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_spheres_1_4_m5_o1_RR_p5.png" width="400px"/>
+				  <figcaption>s = 1</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_spheres_2_4_m5_o1_RR_p5.png" width="400px"/>
+					<figcaption>s = 2</figcaption>
+				  </td>
+				<td style="text-align: center;">
+				<img src="Figures/Part 4/part4_spheres_4_4_m5_o1_RR_p5.png" width="400px"/>
+				<figcaption>s = 4</figcaption>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 4/part4_spheres_8_4_m5_o1_RR_p5.png" width="400px"/>
+				  <figcaption>s = 8</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_spheres_16_4_m5_o1_RR_p5.png" width="400px"/>
+					<figcaption>s = 16</figcaption>
+				  </td>
+				<td style="text-align: center;">
+				<img src="Figures/Part 4/part4_spheres_64_4_m5_o1_RR_p5.png" width="400px"/>
+				<figcaption>s = 64</figcaption>
+				</td>
+			</tr>
+			</table>
+		</div>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+					<img src="Figures/Part 4/part4_spheres_1024_4_m5_o1_RR_p5.png" width="400px"/>
+					<figcaption>s = 1024.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 
 		<h2>Part 5: Adaptive Sampling</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -104,3 +491,32 @@
 		</div>
 	</body>
 </html>
+
+
+
+
+<!-- <p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="cornell.png" width="400px"/>
+				  <figcaption>Caption goes here.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="cornell.png" width="400px"/>
+				  <figcaption>Caption goes here.</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="cornell.png" width="400px"/>
+				  <figcaption>Caption goes here.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="cornell.png" width="400px"/>
+				  <figcaption>Caption goes here.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div> -->
