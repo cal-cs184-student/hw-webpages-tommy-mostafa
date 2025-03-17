@@ -50,7 +50,8 @@
 		a ray generation workflow that uses coordinate transforms to set up the locations of the ray, the camera, and the scene in space. 
 		We also setup a workflow for fast ray triangle intersection checks as well as bounding volume hierarchies for accelerated 
 		ray tracing. We also experiment with hemisphere sampling and direct light sampling for tracing the directions of reflected lights from a surface.
-		We finally test the effects of direct and indirect illumination and depth of ray bounces.
+		The effects of direct and indirect illumination and depth of ray bounces are studied for controlling the noise in an image. Finally, we introduce adaptive
+		sampling to allow for significantly higher sampling in certain pixels, thereby reducing noise in the image without becoming computationally prohibitive. 
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
 		Ray Generation:   
@@ -525,8 +526,50 @@ the left (which only shows the indirect lighting at that depth).</p>
 		</div>
 
 		<h2>Part 5: Adaptive Sampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		The Big Idea: When ray tracing for each pixel in an image, we perform Monte Carlo integration to calculate the radiance in the pixel. This involves sampling many rays across random directions. However, some pixels have lower variance across the distribution of possible radiance values,
+		and this motivates calculating a threshold that can allow for an early termination of the integration since the answer has already converged to a 95% confidence interval around its mean. We can fix sample size and allow for faster ray tracing, or increase the maximum samples to decrease noise 
+		in the image while remaining in a reasonable window of compute. We do the latter in this task.
+		<br>
+		<br>
 
+		Algorithm:
+		In the raytrace_pixel from pathtracer.cpp, we make the following additions:
+		<ul>
+			<li> Initialize s1 and s2 for storage, mean and variance, and n for tracking sample count </li>
+			<li> In the loop, increment s1 by the illuminance of the pixel, and s2 by the illuminance squared </li>
+			<li> If the sample is evenly divisible by the samples per batch, calculate mean and variance:
+				 <code> mean = s1 / n; variance = (1. / (n-1)) * (s2 - s1*mean); </code> </li>
+			<li> Evaluate if loop can break early:  <code>if (1.96 * sqrt(variance / n) <= maxTolerance*mean) break;</code></li>
+		</ul>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 5/dragon_rate.png" width="400px"/>
+				  <figcaption>Sampling rate heat map for the dragon with adaptive sampling.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 5/blob_rate.png" width="400px"/>
+				  <figcaption>Sampling rate heat map for the blob with adaptive sampling.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 5/dragon.png" width="400px"/>
+				  <figcaption>Rendered dragon with adaptive sampling.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 5/blob.png" width="400px"/>
+				  <figcaption>Rendered blob with adaptive sampling.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 		<!-- <h2>(Optional) Part 6: Extra Credit Opportunities</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 		
