@@ -37,7 +37,7 @@
 		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/sp25-hw3-sonic.git">https://github.com/cal-cs184-student/sp25-hw3-sonic.git</a>
 		
 		<figure>
-			<img src="./images/cornell.png" alt="Cornell Boxes with Bunnies" style="width:70%"/>
+			<img src="Figures/cornell.png" alt="Cornell Boxes with Bunnies" style="width:70%"/>
 			<!-- <figcaption>You can add images with captions!</figcaption> -->
 		</figure>
 
@@ -53,26 +53,45 @@
 		We finally test the effects of direct and indirect illumination and depth of ray bounces.
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
-		Ray Generation: We first converted the pixel coordinates to camera coordinates. \[ x*(2*tan(hFov * 0.5)) - tan(hFov * 0.5) \] \[ y*(2*tan(vFov * 0.5)) - tan(vFov * 0.5) \] 
-		We then fixed the minimum and maximum t values of the ray to nClip and fClip, respectively. The ray direction was simply the coordinates normalized since the origin was at (0,0,0). The direction was rotated with the c2w matrix and the origin was translated to pos.
+		Ray Generation:   
+		<ul>
+			<li> Convert pixel coordinates to camera coordinates \[ x*(2*tan(hFov * 0.5)) - tan(hFov * 0.5) \] \[ y*(2*tan(vFov * 0.5)) - tan(vFov * 0.5) \] </li>
+			<li> Fix minimum and maximum t values of the ray to nClip and fClip, respectively </li>
+			<li> Normalized coordinates of ray are its direction </li>
+			<li> Rotate direction with c2w matrix </li>
+			<li> Translate origin with pos </li>
+		</ul>
+		Primitive Intersection:  
+		<ul>
+			<li> Initialize a counter </li>
+			<li> Make "number of samples" many loops through the pixel </li>
+			<li> Each sample in the pixel had the coordinates randomly drawn from a uniform distribution between 0 and 1 </li>
+			<li> Normalize to the buffer coordinates to fit in the image coordinate frame before being passed into generate_ray </li>
+			<li> Build the ray in generate_ray </li>
+			<li> Calculate irradiance with est_radiance_global_illumination and add to counter vector</li>
+			<li> Normalize by number of samples and add to sample buffer </li>
+		</ul>
 
-		Primitive Intersection: We first initialized a counter as we made "number of samples" many loops through the pixel. Each sample in the pixel had the coordinates randomly drawn from a uniform distribution between 0 and 1, and then normalized to the buffer coordinates to fit in the image coordinate frame before being passed into generate_ray. 
-		The irradiance of the pixel was added to a counter vector; the counter vector was normalized by the number of samples after the loop and the corresponding color was updated to the sample buffer.
-
-		Triangle Intersection: In the lecture slides a linear algebra problem was described in the form of Mx = b. In has_intersection we simply set up and solve this for x. The 3 values in x, time of intersection and 2 of the 3 barycentric coordinates, give us all the information needed to confirm a triangle intersection in the bounds of the time frame. In intersect, we check for an 
-		intersection, solve the same values as before, and then use them to update the intersection structure.
+		Triangle Intersection: 
+		<ul>
+			<li> Initialize M, matrix of direction vector and vectors of triangle edges, and b, a vector from the ray origin to the triangle vertex</li>
+			<li> Solve Mx=b for x, the vector of barycentric coordinates for the ray intersection and the time of the intersection </li>
+			<li> Update the ray with where the intersection occurred</li>
+			<li> Update the normal, the primitive pointer, and the BSDF in the intersection structure </li>
+		</ul>
+		
 
 		
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="Figures/Part1/banana.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="Figures/Part 1/banana.png" width="400px"/>
+				  <figcaption>Banana with 2458 primitives</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="Figures/Part1/building.png" width="400px"/>
-				  <figcaption>M.</figcaption>
+				  <img src="Figures/Part 1/building.png" width="400px"/>
+				  <figcaption>Building with 39506 primitives</figcaption>
 				</td>
 			  </tr>
 			</table>
@@ -88,28 +107,38 @@
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="Figures/Part 2/blob.png" width="400px"/>
-				  <figcaption>Blob.</figcaption>
+				  <figcaption>Blob with 196608 primitives. Rendered in 0.2398 s.</figcaption>
 				</td>
 				<td style="text-align: center;">
 				  <img src="Figures/Part 2/maxplanck.png" width="400px"/>
-				  <figcaption>Max Planck.</figcaption>
+				  <figcaption>Max Planck with 50801 primitives. Rendered in 0.3852 s.</figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="Figures/Part 2/dragon.png" width="400px"/>
-				  <figcaption>Dragon.</figcaption>
+				  <figcaption>Dragon with 105120 primitives. Rendered in 0.2230 s.</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="Figures/Part 2/blob.png" width="400px"/>
-				  <figcaption>Blob.</figcaption>
+				  <img src="Figures/Part 2/wall-e.png" width="400px"/>
+				  <figcaption>Wall-E with 240326 primitives. Rendered in 0.5476 s.</figcaption>
 				</td>
 			  </tr>
 			</table>
 		</div>
+
+		Analysis of Rendering Times Across 8 threads (without then with BVH): 
+		<ul>
+			<li> Beetle: 121.3 s and 0.1877 s </li>
+			<li> Peter: 638.5 s and 0.1818 s</li>
+			<li> Teapot: 37.9 s and 0.1711 s</li>
+		</ul>
+		<p>
+			From these results on moderately complex geometries (7558, 40018, and 2464 primitives, respectively), we find that bounding volume hierarchies can produce speedups on the order of 2-3 magnitudes. This speed up occurs because if a ray does not intersect a volume, then all volumes and primitives in the volume do not have to be analyze, potentially saving the computational cost of thousands of conditional statements. When intersections with a volume do occur, we only focus on the primitives or volumes with  in, again eliminating unnecessary intersection checks.
+		</p>
 		<h2>Part 3: Direct Illumination</h2>
 		<p>
-			Direct illumination refers to the light that reflects off a surface due to illumination from a light source. To this for a render, 
+			Direct illumination refers to the light that reflects off a surface due to illumination from a light source. For this to render, 
 			one can trace each ray from the camera to check for intersections with a surface in the scene. Once an intersection is found,  
 			one can sample a hemisphere around the intersection point to generate a direction and check for an intersection with a light source using that 
 			intersection point and direction. Alternatively, one can directly sample the light sources in the scene to check for direct, unobstructed paths between the 
@@ -215,7 +244,7 @@
 		<p>To implement this, we follow the steps below:</p>
 		
 		<ul>
-			<li> Locate an intersection point between a camera ray with depth equal to <code>max_ray_depth</code> and an object in the scene. </li>
+			<li> Locate an intersection point between a camera ray with depth less than <code>max_ray_depth</code> and an object in the scene. </li>
 			<li> Calculate the direct lighting of that point just like in Part 3.  </li>
 			<li> Check if ray depth is greater than one.</li>
 			<li> If Russian Roulette stopping is added, check for probability of exiting here. </li>
