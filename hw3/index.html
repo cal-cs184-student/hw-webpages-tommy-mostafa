@@ -452,16 +452,20 @@ the left (which only shows the indirect lighting at that depth).</p>
 					<img src="Figures/Part 4/part4_bunny_1024_4_m1_o1_RR_p4.png" width="400px"/>
 					<figcaption>m = 1</figcaption>
 				  </td>
+			</tr>
+			<tr>
 				<td style="text-align: center;">
 				<img src="Figures/Part 4/part4_bunny_1024_4_m2_o1_RR_p4.png" width="400px"/>
 				<figcaption>m = 2</figcaption>
 				</td>
-			</tr>
-			<tr>
+			 
+			  
 				<td style="text-align: center;">
 				  <img src="Figures/Part 4/part4_bunny_1024_4_m3_o1_RR_p4.png" width="400px"/>
 				  <figcaption>m = 3</figcaption>
 				</td>
+			</tr>
+			<tr>
 				<td style="text-align: center;">
 					<img src="Figures/Part 4/part4_bunny_1024_4_m4_o1_RR_p4.png" width="400px"/>
 					<figcaption>m = 4</figcaption>
@@ -470,7 +474,7 @@ the left (which only shows the indirect lighting at that depth).</p>
 				<img src="Figures/Part 4/part4_bunny_1024_4_m100_o1_RR_p4.png" width="400px"/>
 				<figcaption>m = 100</figcaption>
 				</td>
-			</tr>
+			  </tr>
 			</table>
 		</div>
 
@@ -492,16 +496,20 @@ the left (which only shows the indirect lighting at that depth).</p>
 					<img src="Figures/Part 4/part4_spheres_2_4_m5_o1_RR_p5.png" width="400px"/>
 					<figcaption>s = 2</figcaption>
 				  </td>
+			</tr>
+			<tr>
 				<td style="text-align: center;">
 				<img src="Figures/Part 4/part4_spheres_4_4_m5_o1_RR_p5.png" width="400px"/>
 				<figcaption>s = 4</figcaption>
 				</td>
-			</tr>
-			<tr>
+			  
+			  
 				<td style="text-align: center;">
 				  <img src="Figures/Part 4/part4_spheres_8_4_m5_o1_RR_p5.png" width="400px"/>
 				  <figcaption>s = 8</figcaption>
 				</td>
+			</tr>
+			<tr>
 				<td style="text-align: center;">
 					<img src="Figures/Part 4/part4_spheres_16_4_m5_o1_RR_p5.png" width="400px"/>
 					<figcaption>s = 16</figcaption>
@@ -510,16 +518,11 @@ the left (which only shows the indirect lighting at that depth).</p>
 				<img src="Figures/Part 4/part4_spheres_64_4_m5_o1_RR_p5.png" width="400px"/>
 				<figcaption>s = 64</figcaption>
 				</td>
-			</tr>
-			</table>
-		</div>
-
-		<div style="display: flex; flex-direction: column; align-items: center;">
-			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  </tr>
 			  <tr>
 				<td style="text-align: center;">
 					<img src="Figures/Part 4/part4_spheres_1024_4_m5_o1_RR_p5.png" width="400px"/>
-					<figcaption>s = 1024.</figcaption>
+					<figcaption>s = 1024</figcaption>
 				</td>
 			  </tr>
 			</table>
@@ -547,11 +550,11 @@ the left (which only shows the indirect lighting at that depth).</p>
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="Figures/Part 5/dragon_rate.png" width="400px"/>
-				  <figcaption>Sampling rate heat map for the dragon with adaptive sampling.</figcaption>
+				  <figcaption>Sampling rate heat map for the dragon with adaptive sampling. Russian roulette probability of early termination set to 0.30.</figcaption>
 				</td>
 				<td style="text-align: center;">
 				  <img src="Figures/Part 5/blob_rate.png" width="400px"/>
-				  <figcaption>Sampling rate heat map for the blob with adaptive sampling.</figcaption>
+				  <figcaption>Sampling rate heat map for the blob with adaptive sampling. Russian roulette probability of early termination set to 0.30.</figcaption>
 				</td>
 			  </tr>
 			</table>
@@ -561,13 +564,42 @@ the left (which only shows the indirect lighting at that depth).</p>
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="Figures/Part 5/dragon.png" width="400px"/>
-				  <figcaption>Rendered dragon with adaptive sampling.</figcaption>
+				  <figcaption>Rendered dragon with adaptive sampling. Russian roulette probability of early termination set to 0.30.</figcaption>
 				</td>
 				<td style="text-align: center;">
 				  <img src="Figures/Part 5/blob.png" width="400px"/>
-				  <figcaption>Rendered blob with adaptive sampling.</figcaption>
+				  <figcaption>Rendered blob with adaptive sampling. Russian roulette probability of early termination set to 0.30.</figcaption>
 				</td>
 			  </tr>
+			</table>
+		</div>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 5/dragon_rate_0.05.png" width="400px"/>
+				  <figcaption>Sampling rate heat map for the dragon with adaptive sampling. Russian roulette probability of early termination set to 0.05.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="Figures/Part 5/blob_rate_0.05.png" width="400px"/>
+				  <figcaption>Sampling rate heat map for the blob with adaptive sampling. Russian roulette probability of early termination set to 0.05.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="Figures/Part 5/dragon_0.05.png" width="400px"/>
+						<figcaption>Rendered dragon with adaptive sampling. Russian roulette probability of early termination set to 0.05.</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="Figures/Part 5/blob_0.05.png" width="400px"/>
+						<figcaption>Rendered blob with adaptive sampling. Russian roulette probability of early termination set to 0.05.</figcaption>
+					</td>
+				</tr>
 			</table>
 		</div>
 		<!-- <h2>(Optional) Part 6: Extra Credit Opportunities</h2>
@@ -585,8 +617,8 @@ the left (which only shows the indirect lighting at that depth).</p>
 		</ul>
 		</div> -->
 
-		<h2> Extra Credit</h2>
-		None.
+		<!-- <h2> Extra Credit</h2>
+		None. -->
 	</body>
 </html>
 
