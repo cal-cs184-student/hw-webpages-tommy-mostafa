@@ -115,12 +115,70 @@
 			</table>
 		</div>
 
-		<p> Increasing the spring constant led makes the material less "stretchy", and we observed fewer vibrations and oscillations when the cloth was dropped. The cloth also hangs higher as the spring forces make it more rigid and overcome gravity </p>
+		<p> Increasing the spring constant led makes the material less "stretchy", and we observed fewer vibrations and oscillations when the cloth was dropped. The cloth also hangs higher as the spring forces make it more rigid and overcome the force of gravity. </p>
 		<p> Increasing the density increased the gravitational force because density is proportional to mass. With a higher gravitational force the cloth hangs down lower, although does not fall down faster as gravity is still constant. </p>
 		<p> Increasing the damping caused the cloth to fall more slowly when released. At a high damping, there were minimal oscillations throughout the cloth as it settled. The final resting state was the same regardless of the damping. At higher damping, more energy is lost to sources we don't model, such as heat and friction. This loss of energy is what leads to fewer oscillations in the material, as they are "damped" out.</p>
 		
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<img src="./images/Part2/pinned4_rest.png" width="400px" />
+			<figcaption>Cloth with 4 pinned corners at rest.</figcaption>
+		</div>
+
+
 		<h2>Part 3: Handling collisions with other objects</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+		Implementation: For both primitives, spheres and planes, we must determing the criterion for when a point mass has crossed the interface. This is simple for the sphere, simply check if the point mass's location is within a distance less than the radius from the origin. 
+		\[  ||\text{Origin} - \text{pm.position}|| < \text{radius} \]
+		For the plane the criterion is slightly trickier, but once we drew the event in 2D:
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<img src="./images/Part3/plane_drawing.jpeg" width="400px" />
+			<figcaption>2D representation of a plane collision event.</figcaption>
+		</div>
+		<br><br>
+		we recognized that the dot product of the normal of the plane with the vector pointing from the point on the plane to the position of the point mass had to be less than zero for the collision.
+		\[ \text{n} \cdot (\text{Position} - \text{pt}) \]
+
+		For spheres, we had to find the new position on the surface and along the direction of the vector pointing from the origin to the point. 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<img src="./images/Part3/sphere_drawing.jpeg" width="400px" />
+			<figcaption>2D representation of a sphere collision event.</figcaption>
+		</div>
+		<br><br>
+		From the image it is clear that the new position can be solved for with
+		\[\text{New Position} = \text{Origin} + \frac{Position - Origin}{||Position - Origin||} \cdot \text{radius}.\]
+		We then take the new position and compute the correction vector from the old position
+		\[ \text{Correction} = \text{New Position} - \text{Last Position}. \]
+
+		We apply the correction with friction scaling by
+		\[ \text{New Position} = \text{Last Position} + (1-f)\text{Correction} . \]
+
+		For the plane, recognize that the magnitude of the vector needed to make the point mass reach the surface is 
+		\[ |\text{n} \cdot (\text{Position} - \text{pt})|.\]
+		However the assignment calls for an offset from the surface, which we simply add on 
+		\[ \text{Magnitude} = |\text{n} \cdot (\text{Position} - \text{pt})| + \text{SURFACE_OFFSET} .\]
+		The direction is simply along the normal. The updated position of pointmasses that cross the plane is 
+		\[ \text{New Position} = Position + \text{Magnitude} \cdot \text{n}. \]
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td>
+						<img src="./images/Part3/ks500.png" width="400px" />
+						<figcaption>Spring constant at 500 Newtons per meter.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part3/ks5000.png" width="400px" />
+						<figcaption>Spring constant at 5000 Newtons per meter.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part3/ks50000.png" width="400px" />
+						<figcaption>Spring constant at 50000 Newtons per meter.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<br><br>
+		As seen above, a lower spring constant lessens the stiffness of the cloth as the force of gravity comes to dominate. This leads to more of the cloth draping over the sphere because the gravity is pulling down on each point mass, slightly stretching each spring. With a lower spring constant, each spring can be stretched more and the cloth is more free to dangle. At a high constant, the springs resist the pull of gravity and maintain the cloth's rigid shape.
 
 		<h2>Part 4: Handling self-collisions</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
