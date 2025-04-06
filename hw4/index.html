@@ -150,14 +150,14 @@
 		\[ \text{Correction} = \text{New Position} - \text{Last Position}. \]
 
 		We apply the correction with friction scaling by
-		\[ \text{New Position} = \text{Last Position} + (1-f)\text{Correction} . \]
+		\[ \text{Corrected Position} = \text{Last Position} + (1-f)\text{Correction} . \]
 
 		For the plane, recognize that the magnitude of the vector needed to make the point mass reach the surface is 
 		\[ |\text{n} \cdot (\text{Position} - \text{pt})|.\]
 		However the assignment calls for an offset from the surface, which we simply add on 
 		\[ \text{Magnitude} = |\text{n} \cdot (\text{Position} - \text{pt})| + \text{SURFACE_OFFSET} .\]
 		The direction is simply along the normal. The updated position of pointmasses that cross the plane is 
-		\[ \text{New Position} = Position + \text{Magnitude} \cdot \text{n}. \]
+		\[ \text{Corrected Position} = Position + \text{Magnitude} \cdot \text{n}. \]
 
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -179,9 +179,120 @@
 		</div>
 		<br><br>
 		As seen above, a lower spring constant lessens the stiffness of the cloth as the force of gravity comes to dominate. This leads to more of the cloth draping over the sphere because the gravity is pulling down on each point mass, slightly stretching each spring. With a lower spring constant, each spring can be stretched more and the cloth is more free to dangle. At a high constant, the springs resist the pull of gravity and maintain the cloth's rigid shape.
+		<br><br>
+		<div style="display: flex; justify-content: center; gap: 20px;">
+			<div style="text-align: center;">
+				<img src="./images/Part3/cloth_resting.png" width="400px" />
+				<figcaption>Cloth resting on the plane.</figcaption>
+			</div>
+			<div style="text-align: center;">
+				<img src="./images/Part3/mirror_cloth_resting.png" width="400px" />
+				<figcaption>Cloth resting on the plane with mirror shading.</figcaption>
+			</div>
+		</div>
+
 
 		<h2>Part 4: Handling self-collisions</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<br><br>
+		Standard parameter values, \( k_s = 5000 \frac{N}{m}\), \(\rho = 15 \frac{g}{cm^2}\), and damping = 0.2
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td>
+						<img src="./images/Part4/standard_early.png" width="400px" />
+						<figcaption>Self-collision early in time, standard parameters.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part4/standard_middle.png" width="400px" />
+						<figcaption>Self-collision midway in time, standard parameters.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part4/standard_final.png" width="400px" />
+						<figcaption>Self-collision end of time, standard parameters.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<br><br>
+		<b>Experiments for the Spring Constant:</b>
+		<br>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td>
+						<img src="./images/Part4/lowks_early.png" width="400px" />
+						<figcaption>Low spring constant, 50 Newtons per meter, early in time.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part4/highks_early.png" width="400px" />
+						<figcaption>High spring constant, 50,000 Newtons per meter, early in time.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="./images/Part4/lowks_middle.png" width="400px" />
+						<figcaption>Low spring constant, 50 Newtons per meter, midway through time.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part4/highks_middle.png" width="400px" />
+						<figcaption>High spring constant, 50,000 Newtons per meter, midway through time.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="./images/Part4/lowks_final.png" width="400px" />
+						<figcaption>Low spring constant, 50 Newtons per meter, end of time.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part4/highks_final.png" width="400px" />
+						<figcaption>High spring constant, 50,000 Newtons per meter, end of time.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<br><br>
+		<b>Analysis for the Spring Constant:</b> With the lower spring constant we immediately see the effects of a less rigid cloth in the additional folds of the material compared witht the high spring constant. A less rigid cloth implies point masses whose actions are more independent of their surrounding neighbors than those in a rigid cloth. Greater independence for the motion of point masses allows for more clustering, creating the folds seen in the images. 
+		These additonal folds increase the number of self-collision avoiding interactions and lead to a more chaotic cloth unraveling. The high spring constant appeared to be more physically realistic and visually appealing than the low spring constant. 
+		<br><br>
+		<b>Experiments for Density:</b>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td>
+						<img src="./images/Part4/lowdensity_early.png" width="400px" />
+						<figcaption>Low density, 1.5 grams per centimeter squared, early in time.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part4/highdensity_early.png" width="400px" />
+						<figcaption>High density, 1500 grams per centimeter squared, early in time.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="./images/Part4/lowdensity_middle.png" width="400px" />
+						<figcaption>Low density, 1.5 grams per centimeter squared, midway through time.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part4/highdensity_middle.png" width="400px" />
+						<figcaption>High density, 1500 grams per centimeter squared, midway through time.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="./images/Part4/lowdensity_final.png" width="400px" />
+						<figcaption>Low density, 1.5 grams per centimeter squared, end of time.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part4/highdensity_final.png" width="400px" />
+						<figcaption>High density, 1500 grams per centimeter squared, end of time.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<br><br>
+		<b>Analysis for Density:</b> High density shares similar behavior for the cloth as a low spring constant because both contribute to the force of gravity dominating the spring forces. High density makes the cloth less rigid because the point masses behave more independently when the gravitational force dominates the spring forces. 
+
+
 
 		<h2>Part 5: Shaders</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
