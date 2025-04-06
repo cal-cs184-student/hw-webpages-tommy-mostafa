@@ -194,7 +194,14 @@
 
 		<h2>Part 4: Handling self-collisions</h2>
 		<br><br>
+
+		<b>Implementation: </b>
+
+
+
+		<br><br>
 		Standard parameter values, \( k_s = 5000 \frac{N}{m}\), \(\rho = 15 \frac{g}{cm^2}\), and damping = 0.2
+		<br>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
@@ -295,7 +302,133 @@
 
 
 		<h2>Part 5: Shaders</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<br><br>
+		
+		
+		
+		<b>Shader Program:</b>
+		
+		<br><br>
+
+		<b>Blinn-Phong: </b>
+		The following parameter values were used: \(k_a = 0.2,\; k_d = 1.0,\; k_s = 0.8,\; I_a = 0.3, \text{ and } p = 200\).
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td>
+						<img src="./images/Part5/ambient.png" width="400px" />
+						<figcaption>Ambient Lighting</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part5/specular.png" width="400px" />
+						<figcaption>Specular Lighting</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="./images/Part5/diffuse.png" width="400px" />
+						<figcaption>Diffuse Lighting</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part5/blinnphong.png" width="400px" />
+						<figcaption>Blinn-Phong Shading</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<br><br>
+		<b>Texture:</b> 
+		<br>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td>
+						<img src="./images/Part5/texture_1.png" width="200px" />
+						<figcaption>Custom texture we used</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part5/texture_out.png" width="400px" />
+						<figcaption>Texture on both surfaces</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part5/texture_in.png" width="400px" />
+						<figcaption>Texture with cloth around sphere</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<br><br>
+		<b>Bump and Displacement:</b> The normal was set to 100 and the height to 0.05 for these images.
+		<br><br>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td>
+					<img src="./images/Part5/texture_2.png" width="400px" />
+					<figcaption>Texture 4 was used in for these shaders.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part5/bump_cloth_and_sphere.png" width="400px" />
+						<figcaption>Bump mapping on cloth and sphere.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part5/bump_cloth_on_sphere.png" width="400px" />
+						<figcaption>Bump mapping on cloth draped over sphere.</figcaption>
+					</td>
+					<td colspan="2">
+						<img src="./images/Part5/displacement_sphere.png" width="400px" />
+						<figcaption>Displacement mapping on sphere.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<br><br>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td>
+						<img src="./images/Part5/bump_o16_a16.png" width="400px" />
+						<figcaption>Bump mapping for -o 16 -a 16.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part5/bump_o128_a128.png" width="400px" />
+						<figcaption>Bump mapping for -o 128 -a 128.</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="./images/Part5/displacement_o16_a16.png" width="400px" />
+						<figcaption>Displacement mapping for -o 16 -a 16.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part5/displacement_o128_a128.png" width="400px" />
+						<figcaption>Displacement mapping for -o 128 -a 128.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<br><br>
+		<b>Mirror</b>
+		<br><br>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td>
+						<img src="./images/Part5/mirror_ball_and_cloth.png" width="400px" />
+						<figcaption>Mirror shading on sphere and cloth, separate.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part5/mirror_cloth_on_ball.png" width="400px" />
+						<figcaption>Mirror shading on cloth resting on sphere.</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+
 
 		<h2>(Optional) Part 6: Extra Credit - Additional cloth simulation features!</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
