@@ -46,7 +46,8 @@
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		This homework attempts to create and visualize realistic cloth simulations. We handle collisions with other objects
+		as well as self collisions in an efficient way. We also add different shaders to the cloth to give various textures and lighting effects. 
 
 		<h2>Part 1: Masses and springs</h2>
 
@@ -69,10 +70,6 @@
 				<td style="text-align: center;">
 				  <img src="./images/Part1/all_constraints.png" width="800px"/>
 				  <figcaption>All constraints are active</figcaption>
-				</td>
-			  </tr>
-			</table>
-		</div>
 				</td>
 			  </tr>
 			</table>
@@ -114,11 +111,14 @@
 				</tr>
 			</table>
 		</div>
-
-		<p> Increasing the spring constant led makes the material less "stretchy", and we observed fewer vibrations and oscillations when the cloth was dropped. The cloth also hangs higher as the spring forces make it more rigid and overcome the force of gravity. </p>
-		<p> Increasing the density increased the gravitational force because density is proportional to mass. With a higher gravitational force the cloth hangs down lower, although does not fall down faster as gravity is still constant. </p>
-		<p> Increasing the damping caused the cloth to fall more slowly when released. At a high damping, there were minimal oscillations throughout the cloth as it settled. The final resting state was the same regardless of the damping. At higher damping, more energy is lost to sources we don't model, such as heat and friction. This loss of energy is what leads to fewer oscillations in the material, as they are "damped" out.</p>
 		
+		The values of the parameters of the simulation, like the spring constant, density, and damping, can significantly affect the visualization:
+		<ul>
+			<li> Increasing the spring constant led makes the material less "stretchy", and we observed fewer vibrations and oscillations when the cloth was dropped. The cloth also hangs higher as the spring forces make it more rigid and overcome the force of gravity. </li>
+			<li> Increasing the density increased the gravitational force because density is proportional to mass. With a higher gravitational force the cloth hangs down lower, although does not fall down faster as gravity is still constant. </li>
+			<li> Increasing the damping caused the cloth to fall more slowly when released. At a high damping, there were minimal oscillations throughout the cloth as it settled. The final resting state was the same regardless of the damping. At higher damping, more energy is lost to sources we don't model, such as heat and friction. This loss of energy is what leads to fewer oscillations in the material, as they are "damped" out.</li>
+		</ul>  
+
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<img src="./images/Part2/pinned4_rest.png" width="400px" />
 			<figcaption>Cloth with 4 pinned corners at rest.</figcaption>
@@ -195,7 +195,15 @@
 		<h2>Part 4: Handling self-collisions</h2>
 		<br><br>
 
-		<b>Implementation: </b>
+		<p>Our implementation for handling self collisions follows the following steps:</p>
+
+		<ul>
+			<li> Partition the cloth volume into 3D boxes. </li>
+			<li> Map each point mass into a corresponding box. </li>
+			<li> Store the point mass in a hash map with key equal to the sum of the coordinates of its mapped location obtained above each multiplied by a prime number. </li>
+			<li> Loop over all point masses to build this spatial hash map. </li>
+			<li> For each point mass, use the hash map to locate closest candidates to each point mass and apply a correction vector to candidates that are too close to the original point mass. </li>
+		</ul> 
 
 
 
@@ -306,12 +314,16 @@
 		
 		
 		
-		<b>Shader Program:</b>
+		<p>A shader program is a program that runs on the GPU that takes in geometry and turns it into color/lighting/texture effects on pixels. 
+			The vertices go into the vertex shader which applies transformations and passes interpolated data to the fragment shader. The fragment shader
+		then computes the lighting and/or texture effects on the geometry (given by the vertex shader) to output a final pixel color. </p>
 		
 		<br><br>
 
-		<b>Blinn-Phong: </b>
-		The following parameter values were used: \(k_a = 0.2,\; k_d = 1.0,\; k_s = 0.8,\; I_a = 0.3, \text{ and } p = 200\).
+		<p>The Blinn-Phong shading model is a way to model lighting reflection effects by splitting the reflections into ambient, diffuse, and specular reflections. 
+			This produces fairly convicing lighting effects at a fraction of the cost of more realistic lighting models like global illumination. </p>
+
+		<p>We used the following parameter values for our Blinn-Phong shading model: \(k_a = 0.2,\; k_d = 1.0,\; k_s = 0.8,\; I_a = 0.3, \text{ and } p = 200\). </p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
@@ -428,9 +440,8 @@
 			</table>
 		</div>
 
-
-
-		<h2>(Optional) Part 6: Extra Credit - Additional cloth simulation features!</h2>
+	</div>
+		<!-- <h2>(Optional) Part 6: Extra Credit - Additional cloth simulation features!</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 		
 		<h2>Additional Notes (please remove)</h2>
@@ -443,6 +454,6 @@
 				</ul>
 			</li>
 		</ul>
-		</div>
+		</div> -->
 	</body>
 </html>
