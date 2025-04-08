@@ -46,12 +46,18 @@
 		-->
 
 		<h2>Overview</h2>
-		This homework attempts to create and visualize realistic cloth simulations. We handle collisions with other objects
-		as well as self collisions in an efficient way. We also add different shaders to the cloth to give various textures and lighting effects. 
+		This homework attempts to create and visualize realistic cloth simulations by modeling cloths as collections of spring mass systems. 
+		We handle cloth collisions with other objects
+		as well as self collisions in an efficient way. We also implement different shaders to the cloth to give various textures and lighting effects. 
 
 		<h2>Part 1: Masses and springs</h2>
 
-		<p>Here is how modifying the constraints affects the wire mesh in Part 1.</p>
+		<p>We start by modeling our cloth as a collection of point masses connected together by springs. We can have multiple constraints depending on the 
+			configuration of the springs attached to the masses. The springs can be connected between each point mass 
+			and the one to its left and the one above it for a strucutral constraint. For a bending constraint, the springs are connected between each point mass
+			and the the one two point masses to its left and the one two point masses above it. We also implement a shearing constraint where the springs are connected
+			between each point mass and the one diagonal and above to its left and the one diagonal and above to its right. 
+			Here is how modifying the constraints affects the wire mesh in Part 1.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
@@ -193,8 +199,6 @@
 
 
 		<h2>Part 4: Handling self-collisions</h2>
-		<br><br>
-
 		<p>Our implementation for handling self collisions follows the following steps:</p>
 
 		<ul>
@@ -205,11 +209,9 @@
 			<li> For each point mass, use the hash map to locate closest candidates to each point mass and apply a correction vector to candidates that are too close to the original point mass. </li>
 		</ul> 
 
-
-
+		The screenshots below show the cloth as it falls to the ground and collides with itself using standard parameter values, \( k_s = 5000 \frac{N}{m}\), \(\rho = 15 \frac{g}{cm^2}\), and damping = 0.2:
 		<br><br>
-		Standard parameter values, \( k_s = 5000 \frac{N}{m}\), \(\rho = 15 \frac{g}{cm^2}\), and damping = 0.2
-		<br>
+
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
@@ -230,7 +232,7 @@
 		</div>
 		<br><br>
 		<b>Experiments for the Spring Constant:</b>
-		<br>
+		<br><br>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
@@ -243,6 +245,7 @@
 						<figcaption>High spring constant, 50,000 Newtons per meter, early in time.</figcaption>
 					</td>
 				</tr>
+
 				<tr>
 					<td>
 						<img src="./images/Part4/lowks_middle.png" width="400px" />
@@ -253,6 +256,7 @@
 						<figcaption>High spring constant, 50,000 Newtons per meter, midway through time.</figcaption>
 					</td>
 				</tr>
+
 				<tr>
 					<td>
 						<img src="./images/Part4/lowks_final.png" width="400px" />
@@ -270,6 +274,7 @@
 		These additonal folds increase the number of self-collision avoiding interactions and lead to a more chaotic cloth unraveling. The high spring constant appeared to be more physically realistic and visually appealing than the low spring constant. 
 		<br><br>
 		<b>Experiments for Density:</b>
+		<br><br>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
@@ -314,12 +319,12 @@
 		
 		<p>A shader program is a program that runs on the GPU that takes in geometry and turns it into color/lighting/texture effects on pixels. 
 			The vertices go into the vertex shader which applies transformations and passes interpolated data to the fragment shader. The fragment shader
-		then computes the lighting and/or texture effects on the geometry (given by the vertex shader) to output a final pixel color. </p>
+		then computes the lighting and/or texture effects on the geometry (given by the vertex shader) to output a final pixel color (or more accurately fragment color). </p>
 
 		<p>The Blinn-Phong shading model is a way to model lighting reflection effects by splitting the reflections into ambient, diffuse, and specular reflections. 
 			This produces fairly convicing lighting effects at a fraction of the cost of more realistic lighting models like global illumination. </p>
 
-		<p>We used the following parameter values for our Blinn-Phong shading model: \(k_a = 0.2,\; k_d = 1.0,\; k_s = 0.8,\; I_a = 0.3, \text{ and } p = 200\). </p>
+		<p>We use the following parameter values for our Blinn-Phong shading model: \(k_a = 0.2,\; k_d = 1.0,\; k_s = 0.8,\; I_a = 0.3, \text{ and } p = 200\). </p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
@@ -345,8 +350,8 @@
 			</table>
 		</div>
 		<br><br>
-		<b>Texture:</b> 
-		<br>
+		<b>Texture Mapping:</b> 
+		<br><br>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
@@ -354,6 +359,13 @@
 						<img src="./images/Part5/texture_1.png" width="200px" />
 						<figcaption>Custom texture we used</figcaption>
 					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
 					<td>
 						<img src="./images/Part5/texture_out.png" width="400px" />
 						<figcaption>Texture on both surfaces</figcaption>
@@ -374,8 +386,15 @@
 				<tr>
 					<td>
 					<img src="./images/Part5/texture_2.png" width="400px" />
-					<figcaption>Texture 4 was used in for these shaders.</figcaption>
+					<figcaption>Texture 4 was used for these shaders.</figcaption>
 					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
 					<td>
 						<img src="./images/Part5/bump_cloth_and_sphere.png" width="400px" />
 						<figcaption>Bump mapping on cloth and sphere.</figcaption>
@@ -384,16 +403,29 @@
 						<img src="./images/Part5/bump_cloth_on_sphere.png" width="400px" />
 						<figcaption>Bump mapping on cloth draped over sphere.</figcaption>
 					</td>
-					<td colspan="2">
+				</tr>
+				<tr>
+					<td>
 						<img src="./images/Part5/displacement_sphere.png" width="400px" />
 						<figcaption>Displacement mapping on sphere.</figcaption>
+					</td>
+					<td>
+						<img src="./images/Part5/displacement_sphere_exaggerated.png" width="400px" />
+						<figcaption>Exaggerated displacement mapping on sphere (height = 0.5).</figcaption>
 					</td>
 				</tr>
 			</table>
 		</div>
 
-		<br><br>
+		<p>The displacement and bump mapping appear similar for low heights in this texture because of its symmetric, strucutred nature. When we 
+			increase the height to 0.5 from 0.05, however, we start to see how the displacement mapping actually displaces parts of the mesh to match the protrusions
+			in the texture. This can be noticed if we look at the edge of the sphere and how it looks uneven because of these protrusions. This effect, as expected,
+			is not seen in bump mapping.
+		</p>
 
+		<br><br>
+		<b> Different mesh coarseness values:</b>
+		<br><br>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
@@ -418,8 +450,14 @@
 				</tr>
 			</table>
 		</div>
+
+		<p>We see some slight differences in the obtained images when we increase the resolution for both displacement and bump mapping. The higher resolution
+			displacment mapping images show a more visible texture on the surface of the sphere with the different heights more pronounced. This also results in 
+		better lighting effect with the light interating with the rougher surface more visibly. The same differences can also be observed for bump mapping albeit less
+	noticeably.  </p>
+
 		<br><br>
-		<b>Mirror</b>
+		<b>Mirror Shader</b>
 		<br><br>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
